@@ -50,7 +50,19 @@ start:
  je .loadsecondcmd
 
  mov si, input_buffer
+ mov di, promptcmd
+ call strcmp
+ cmp al, 1
+ je .promptchng
+
+ mov si, input_buffer
  call print
+ jmp .repl
+
+.promptchng:
+ mov si, prompt
+ mov cx, 16
+ call read_input
  jmp .repl
 
 .loadfirstcmd:
@@ -201,6 +213,7 @@ print:
 .done:
  ret
 
+promptcmd db "chprmpt", 0
 progerrormsg db "Error loading program, please try again!", 13, 10, 0
 boot_drive db 0
 loadfirstcmd db "load1", 0
@@ -211,6 +224,6 @@ rebootcmd db "reboot", 0
 input_buffer times 16 db 0
 info db "Kernel written in pure assembly, x86_16.", 13, 10, 0
 welcome db "Welcome into assembly!", 13, 10, 0
-prompt db "assembly > ", 0
+prompt db "assembly > ", 0, 0, 0, 0, 0 ; Make the prompt 16 bytes long.
 
 times 1024-($-$$) db 0
